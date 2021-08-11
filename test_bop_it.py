@@ -1,4 +1,4 @@
-from micro_bopit import create_exponential_decay
+from bop_it import create_exponential_decay
 
 def test_create_exponential_decay():
     fn = create_exponential_decay(1500, 200)
