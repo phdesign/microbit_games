@@ -11,8 +11,8 @@ OPTIONS = [
     (Image.ARROW_W, Input.BUTTON_A),
     (Image.ARROW_E, Input.BUTTON_B)
 ]
-WAIT_START = 1500
-DECAY_RATE = 200
+WAIT_START_MS = 1500
+DECAY_RATE = 50
 
 def create_exponential_decay(inital_value, decay_rate):
     def exponential_decay(time):
@@ -43,25 +43,31 @@ def play():
     sleep(1)
 
     start = running_time()
-    wait_decay = create_exponential_decay(WAIT_START, DECAY_RATE);
+    wait_decay = create_exponential_decay(WAIT_START_MS, DECAY_RATE);
     while True:
-        elapsed = running_time() - start
-        wait = round(wait_decay(elapsed / 1000), 4)
+        elapsed_sec = (running_time() - start) / 1000
+        wait_ms = round(wait_decay(elapsed_sec), 4)
         option, expected = OPTIONS[randint(0, 1)]
         display.show(option)
-        result = wait_for_input(wait)
+        result = wait_for_input(wait_ms)
         if result == expected:
             score += 1
             display.clear()
-            sleep(1)
+            sleep(round(wait_ms / 2000, 4))
         else:
             display.show(Image.NO)
             sleep(1)
             break
     
-    display.scroll("Score: {:d}".format(score))
+    return score
 
 if __name__ == "__main__":
+    high_score = 0
     while True:
         if button_a.is_pressed():
-            play()
+            score = play()
+            if score > high_score:
+                high_score = score
+                display.show(Image.HAPPY)
+                sleep(1)
+            display.scroll("Score: {:d}".format(score))
