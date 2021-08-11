@@ -4,6 +4,13 @@ from random import randint
 import math
 import music
 
+# The starting time in milliseconds we will wait for a response.
+WAIT_START_MS = 1500
+# How quickly the wait time reduces. A smaller value means it shortens more quickly.
+DECAY_RATE = 50
+# Sound volume
+VOLUME = 160
+
 class Input:
     BUTTON_A = 1
     BUTTON_B = 2
@@ -14,15 +21,6 @@ class Option:
         self.prompt = prompt
         self.expected = exected
         self.sound = sound
-
-OPTIONS = [
-    Option(Image.ARROW_W, Input.BUTTON_A, "D4:4"),
-    Option(Image.ARROW_E, Input.BUTTON_B, "E4:4"),
-    Option(Image.ARROW_N, Input.PIN_LOGO, "F4:4")
-]
-WAIT_START_MS = 1500
-DECAY_RATE = 50
-VOLUME = 160
 
 def create_exponential_decay(inital_value, decay_rate):
     def exponential_decay(time):
@@ -44,7 +42,7 @@ def wait_for_input(wait_for):
         if elapsed > wait_for:
             return None
 
-def play():
+def play(options):
     score = 0
 
     display.clear()
@@ -62,7 +60,7 @@ def play():
         elapsed_sec = (running_time() - start) / 1000
         wait_ms = round(wait_decay(elapsed_sec), 4)
 
-        option = OPTIONS[randint(0, 2)]
+        option = options[randint(0, 2)]
         display.show(option.prompt)
         music.play(option.sound)
 
@@ -81,10 +79,15 @@ def play():
 
 if __name__ == "__main__":
     set_volume(VOLUME)
+    options = [
+        Option(Image.ARROW_W, Input.BUTTON_A, "D4:4"),
+        Option(Image.ARROW_E, Input.BUTTON_B, "E4:4"),
+        Option(Image.ARROW_N, Input.PIN_LOGO, "F4:4")
+    ]
     high_score = 0
     while True:
         if button_a.is_pressed():
-            score = play()
+            score = play(options)
             if score > high_score:
                 high_score = score
                 music.play(music.PRELUDE, wait=False)
