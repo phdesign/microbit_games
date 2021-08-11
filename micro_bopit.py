@@ -2,17 +2,25 @@ from microbit import *
 from time import sleep
 from random import randint
 import math
+import music
 
 class Input:
     BUTTON_A = 1
     BUTTON_B = 2
 
+class Option:
+    def __init__(self, prompt, exected, sound):
+        self.prompt = prompt
+        self.expected = exected
+        self.sound = sound
+
 OPTIONS = [
-    (Image.ARROW_W, Input.BUTTON_A),
-    (Image.ARROW_E, Input.BUTTON_B)
+    Option(Image.ARROW_W, Input.BUTTON_A, "D4:4"),
+    Option(Image.ARROW_E, Input.BUTTON_B, "E4:4")
 ]
 WAIT_START_MS = 1500
 DECAY_RATE = 50
+VOLUME = 160
 
 def create_exponential_decay(inital_value, decay_rate):
     def exponential_decay(time):
@@ -35,6 +43,9 @@ def wait_for_input(wait_for):
 def play():
     score = 0
 
+    display.clear()
+    music.play(music.PRELUDE, wait=False)
+    sleep(1)
     display.show("3")
     sleep(0.7)
     display.show("2")
@@ -47,10 +58,13 @@ def play():
     while True:
         elapsed_sec = (running_time() - start) / 1000
         wait_ms = round(wait_decay(elapsed_sec), 4)
-        option, expected = OPTIONS[randint(0, 1)]
-        display.show(option)
+
+        option = OPTIONS[randint(0, 1)]
+        display.show(option.prompt)
+        music.play(option.sound)
+
         result = wait_for_input(wait_ms)
-        if result == expected:
+        if result == option.expected:
             score += 1
             display.clear()
             sleep(round(wait_ms / 2000, 4))
@@ -62,12 +76,16 @@ def play():
     return score
 
 if __name__ == "__main__":
+    set_volume(VOLUME)
     high_score = 0
     while True:
         if button_a.is_pressed():
             score = play()
             if score > high_score:
                 high_score = score
+                music.play(music.POWER_UP, wait=False)
                 display.show(Image.HAPPY)
                 sleep(1)
-            display.scroll("Score: {:d}".format(score))
+                display.scroll("High score: {:d}".format(score), wait=False)
+            else:
+                display.scroll("Score: {:d}".format(score), wait=False)
