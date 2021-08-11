@@ -36,26 +36,27 @@ def play():
     score = 0
 
     display.show("3")
-    sleep(700)
+    sleep(0.7)
     display.show("2")
-    sleep(700)
+    sleep(0.7)
     display.show("1")
-    sleep(1000)
+    sleep(1)
 
     start = running_time()
     wait_decay = create_exponential_decay(WAIT_START, DECAY_RATE);
     while True:
         elapsed = running_time() - start
-        wait = round(wait_decay(elapsed / 1000))
+        wait = round(wait_decay(elapsed / 1000), 4)
         option, expected = OPTIONS[randint(0, 1)]
         display.show(option)
         result = wait_for_input(wait)
         if result == expected:
             score += 1
-            sleep(1000)
+            display.clear()
+            sleep(1)
         else:
             display.show(Image.NO)
-            sleep(1000)
+            sleep(1)
             break
     
     display.scroll("Score: {:d}".format(score))
