@@ -34,7 +34,9 @@ Install pytest
 pip install pytest
 ```
 
-Run test suite
+Now install microbit stubs from https://github.com/PhonicCanine/microbit
+
+Then run test suite
 
 ```
 pytest
